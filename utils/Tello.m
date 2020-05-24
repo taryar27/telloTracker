@@ -9,6 +9,10 @@ classdef Tello < handle
     properties (SetAccess = private)
         drone; % drone object created at class initialisation
         camera; % flight camera mounted on the drone
+        vx = 0.4; % default speed of the drone
+        vy = 0.4;
+        vz = 0.4;
+        wait = true; % default drone mode. True = drone waits until movement is finished.
     end
     
     methods
@@ -73,26 +77,47 @@ classdef Tello < handle
             self.drone.land();
         end
         
-        % method to end current drone mission
-        function abort(self)
-            self.drone.abort();
-        end
         
         % For translational movements.
         % translation: movement in 3D space. Must be specified in [x y z]
         % displacement.
-        % speed: speed of the drone for the specified movement. default is
+        % speed: speed of the drone for the specified movement in xyz directions. default is
         % 0.4 m/s.
         % wait: boolean value. true = matlab code is blocked until drone
         % completes movement. false = non-blocking mode.
-        function transl(self, translation, speed, wait)
-            switch nargin
-                case 1
-                    self.drone.move(translation);
-                case 2
-                    self.drone.move(translation, 'Speed', speed);
-                case 3
-                    self.drone.move(translation, 'Speed', speed, 'WaitUntilDone', wait);
+        % Speed and Wait values can be changed with the following setters.
+        
+        function setSpeed(self, vx, vy, vz)
+            self.vx = vx;
+            self.vy = vy;
+            self.vz = vz;
+        end
+        
+        function setMode(self, wait)
+            self.wait = wait;
+        end
+        
+        % translation distance has to be between 0.2 and 5 metres
+        function transl(self, translation)
+            if translation(1) < -0.2
+                self.drone.moveback('Distance',abs(translation(1)),'Speed',self.vx,'WaitUntilDone',self.wait);
+            elseif translation(1) > 0.2
+                self.drone.moveforward('Distance',abs(translation(1)),'Speed',self.vx,'WaitUntilDone',self.wait);
+            else
+            end
+            
+            if translation(2) < -0.2
+                self.drone.moveleft('Distance',abs(translation(2)),'Speed',self.vy,'WaitUntilDone',self.wait);
+            elseif translation(2) > 0.2
+                self.drone.moveright('Distance',abs(translation(2)),'Speed',self.vy,'WaitUntilDone',self.wait);
+            else
+            end
+            
+            if translation(3) < -0.2
+                self.drone.moveup('Distance',abs(translation(3)),'Speed',self.vz,'WaitUntilDone',self.wait);
+            elseif translation(3) > 0.2
+                self.drone.movedown('Distance',abs(translation(3)),'Speed',self.vz,'WaitUntilDone',self.wait);
+            else
             end
         end
         
