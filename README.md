@@ -2,4 +2,4 @@
 Face detection and visual servoing on DJI Tello drone with MATLAB.
 
 
-![](image.png)
+![](https://au.mathworks.com/help/supportpkg/ryzeio/ref/ryze_drone_with_axes.jpg)
