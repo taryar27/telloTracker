@@ -13,7 +13,7 @@ classdef Tello < handle
         vy = 0.4;
         vz = 0.4;
         wait = true; % default drone mode. True = drone waits until movement is finished.
-        target = [380 260 200 200];% target bounding box for the drone
+        target = ;% target bounding box for the drone
     end
     
     methods
@@ -27,10 +27,6 @@ classdef Tello < handle
                 self.drone = ryze();
             end
             self.camera = camera(self.drone);
-        end
-        
-        function target = getTarget(self)
-            target = self.target;
         end
         
         % Returns current state of the drone. Landing, Hovering etc.

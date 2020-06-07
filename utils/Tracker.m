@@ -11,40 +11,45 @@ classdef Tracker < handle
     methods
         % function to set the target to track
         function setTarget(self, target)
-            self.target = target;
+            self.target = [target(1),target(2);target(1)+target(3),target(2);
+                target(1),target(2)+target(4);target(1)+target(3),target(2)+target(4)];
         end
 
         % function to get velocity from to track the target
         function vc = getVelocity(self, bbox)
-            % The following algorithm calculates the value of Z 
-            % 30cm = 476
-            % 40cm = 334
-            % 50cm = 282
-            % 60cm = 250
-            % 100cm = 168
-            Z = 39606 * power(bbox(4), -1.176);
-            
-            % The following algorithm calculates control velocity to move
-            % the observed image to the target
-            obs = [bbox(1),bbox(2);bbox(1)+bbox(3),bbox(2);
-                bbox(1),bbox(2)+bbox(4);bbox(1)+bbox(3),bbox(2)+bbox(4)];
-            
-            Obsxy = (obs-self.p)/self.f;
-            xy = (self.target-self.p)/self.f;
-            
-            n = length(self.target(:,1));
+            if ~isempty(bbox)
+                % The following algorithm calculates the value of Z 
+                % 30cm = 476
+                % 40cm = 334
+                % 50cm = 282
+                % 60cm = 250
+                % 100cm = 168
+                Z = 39606 * power(bbox(4), -1.176);
 
-            Lx = [];
-            for i=1:n
-                Lxi = self.getLx(xy(i,1),xy(i,2),Z);
-                Lx = [Lx;Lxi];
+                % The following algorithm calculates control velocity to move
+                % the observed image to the target
+                obs = [bbox(1),bbox(2);bbox(1)+bbox(3),bbox(2);
+                    bbox(1),bbox(2)+bbox(4);bbox(1)+bbox(3),bbox(2)+bbox(4)];
+
+                Obsxy = (obs-self.p)/self.f;
+                xy = (self.target-self.p)/self.f;
+
+                n = length(self.target(:,1));
+
+                Lx = [];
+                for i=1:n
+                    Lxi = self.getLx(xy(i,1),xy(i,2),Z);
+                    Lx = [Lx;Lxi];
+                end
+
+                e2 = Obsxy-xy;
+                e = reshape(e2',[],1);
+
+                Lx2 = inv(Lx'*Lx)*Lx';
+                vc = -self.lambda*Lx2*e;
+            else
+                vc = [0,0,0,0,0,0];
             end
-
-            e2 = Obsxy-xy;
-            e = reshape(e2',[],1);
-
-            Lx2 = inv(Lx'*Lx)*Lx';
-            vc = -self.lambda*Lx2*e;
         end
         
         % function to get image jacobian from x,y and Z camera points
