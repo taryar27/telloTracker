@@ -105,21 +105,21 @@ while true
             % moves the drone away from the object (-x)
             c.transl([-0.25 0 0]);
         end
-        
+
         if v(2) > thres
             % moves the drone down (+z)
-            c.transl([0 0 0.25]);
+            c.transl([0 0 -0.25]);
         elseif v(2) < -thres
             % moves the drone up (-z)
-            c.transl([0 0 -0.25]);
+            c.transl([0 0 0.25]);
         end
         
-        if v(1) > -thres
+        if v(1) < -thres
             % moves the drone left (+y)
-            c.transl([0 0.25 0]);
-        elseif v(1) < thres
-            % moves the drone right (-y)
             c.transl([0 -0.25 0]);
+        elseif v(1) > thres
+            % moves the drone right (-y)
+            c.transl([0 0.25 0]);
         end
     end
     % end of drone flight controls
